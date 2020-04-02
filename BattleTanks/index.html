@@ -3,10 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Battle Tanks</title>
     <script src="game.js"></script>
 </head>
 <body>
-    <canvas id='game' width='1056' height="576"></canvas>
+    <div id="displayarea" style="width: 1056px; height: 576px;">
+
+        <!--Menu-->
+        <div id="menu" style="width: 1056px; height: 576px; position: relative;">
+                <img src="img/screen/uvod.png" text-a style="position: absolute;">
+            <div style=" width: 270px; margin: auto;">
+                <img src="img/screen/playB.png" style="position: relative; margin-top: 35%;" onclick="start()">
+                <img src="img/screen/controlB.png" style="position: relative; margin-top: 15%;" onclick="go_to_controls()">
+                <img src="img/screen/exitB.png" style="position: relative; margin-top: 15%" onclick="self.close()">
+            </div>
+
+        </div>
+
+        <!--Canvas-->
+        <div id="game_display" style="display: none; width: 1056px; height: 576px;">
+            <canvas id="game" width="1056" height="576"></canvas>
+        </div>
+
+        <!--Controls-->
+        <div id="controls" style="display: none; width: 1056px; height: 576px;">
+            <img src="img/screen/controlsS.png" style="position:absolute;">
+            <img src="img/screen/backB.png" style="position: relative; margin-top: 480px; margin-left: 850px;" onclick="go_to_menu()">
+        </div>
+
+        <!--Deafeat-->
+        <div id="defeat" style="display: none; width: 1056px; height: 576px;">
+            <img src="img/screen/defeatS.png" style="position:absolute;">
+            <img src="img/screen/playB.png" style="position: relative; margin-top: 236px; margin-left: 523px;" onclick="start()">
+        </div>
+    </div>
 </body>
 </html>

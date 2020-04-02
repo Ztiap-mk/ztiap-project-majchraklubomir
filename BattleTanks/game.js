@@ -1,28 +1,64 @@
 var width=1056      // 33 kociek
 var heigth=576      // 18 kociek
-
-var xplayer = 5*32 ;
-var yplayer = 5*32 ;
-var xenemy = 9*32 ;
-var yenemy = 6*32 ;
-
-
-var pos;
+var box =32;
 var key = [];
-var x,y;
 
 level = new Image();
 player = new Image();
 enemy = new Image();
 enemyBase = new Image();
 blackWall = new Image();
+wall = new Image();
 
 
-level.src = 'img/level.png';
-player.src = 'img/player.png';
-enemy.src = 'img/enemy.png';
-enemyBase.src = 'img/enemy-base.png';
-blackWall.src = 'img/black-wall.png';
+level.src = 'img/game/level.png';
+player.src = 'img/game/player.png';
+enemy.src = 'img/game/enemy.png';
+enemyBase.src = 'img/game/enemyBase.png';
+blackWall.src = 'img/game/blackWall.png';
+wall.src = 'img/game/wall.png';
+
+function go_to_game(){
+  document.getElementById("menu").style.display = "none";
+  document.getElementById("controls").style.display = "none";
+  document.getElementById("defeat").style.display = "none";
+  document.getElementById("game_display").style.display = "block";
+}
+
+function go_to_menu(){
+  document.getElementById("game_display").style.display = "none";
+  document.getElementById("controls").style.display = "none";
+  document.getElementById("menu").style.display = "block";
+  document.getElementById("defeat").style.display = "none";
+}
+
+function go_to_controls() {
+  document.getElementById("game_display").style.display = "none";
+  document.getElementById("menu").style.display = "none";
+  document.getElementById("controls").style.display = "block";
+  document.getElementById("defeat").style.display = "none";
+}
+
+function go_to_defeat() {
+  document.getElementById("game_display").style.display = "none";
+  document.getElementById("menu").style.display = "none";
+  document.getElementById("controls").style.display = "none";
+  document.getElementById("defeat").style.display = "block";
+}
+//Initialize
+function init(){
+  inside = {
+    wallx:7 * box,
+    wally:12 *box,
+    xplayer: 5*box ,
+    yplayer: 5*box ,
+    xenemy: 9*box ,
+    yenemy: 6*box ,
+    rplayer:0,
+  }
+}
+
+
 
 // View
 function draw(){
@@ -32,41 +68,85 @@ function draw(){
     ctx.fillStyle = "#ed1c24";
     ctx.textAlign = "center";
     ctx.fillText("Battle Tanks", width/2, 48);
-    ctx.drawImage(enemyBase, 5*32, 7*32);
-    ctx.drawImage(blackWall,  5*32, 4*32);
-    ctx.drawImage(enemy, xenemy, yenemy);
-    ctx.drawImage(player, xplayer, yplayer);
+    ctx.drawImage(enemyBase, 5*box, 7*box);
+    border();
+    ctx.save()
+    ctx.translate(inside.xplayer,inside.yplayer);
+    ctx.rotate(inside.rplayer*(Math.PI/180))
+    ctx.drawImage(player, -16,-16);
+    ctx.restore()
+    ctx.drawImage(enemy, inside.xenemy, inside.yenemy);
+    ctx.drawImage(wall, inside.wallx,inside.wally);
 }
 
+function border(){
+  for (var w = 0; w < canvas.width; w += 32) {
+    for (var h = 0; h < canvas.height; h  += 32) {
+        if((w==0 && h>=64 && h<=heigth-32) || (w==width-32 && h>=64 && h<=heigth-32) || 
+        (w<width-32 && h==64) || (w<width-32 && h==heigth-32)) ctx.drawImage(blackWall, w, h);
+    }
+  }
+}
 
 // Controller
 function move() {
-    document.onkeydown=function(e)
+    window.onkeydown=function(event)
     {
-      pos=1;
-      key=window.event?e.keyCode:e.which;
-    }
-    document.onkeyup=function(e){pos=0;}
-      if(pos==0)return;
-      if(key==37)xplayer-=4;
-      if(key==38)yplayer-=4;
-      if(key==39)xplayer+=4;
-      if(key==40)yplayer+=4;
+      key[event.keyCode] =true;
+    };
+    window.onkeyup=function(event){
+      key[event.keyCode] =false;
+    };
+      if(key[37]) {
+        inside.xplayer-=2;
+        inside.rplayer=270;
+      }
+      if(key[38]) {
+        inside.yplayer-=2;
+        inside.rplayer=0;
+      }
+      if(key[39]) {
+        inside.xplayer+=2;
+        inside.rplayer=90;
+      }
+      if(key[40]) {
+        inside.yplayer+=2;
+        inside.rplayer=180;
+      }
+
+      if(key[37] && key[38]) inside.rplayer = 315;
+      if(key[37] && key[40]) inside.rplayer = 225;
+      if(key[39] && key[38]) inside.rplayer = 45;
+      if(key[39] && key[40]) inside.rplayer = 135;
+
+      if(inside.xplayer>width-48) game_session = false;
+      else if(inside.xplayer<48) game_session = false;
+      else if(inside.yplayer>heigth-48) game_session = false;
+      else if(inside.yplayer<112) game_session = false;
+
+      
 }
+
+
+
+
 
 // Main loop
 function main() {
-
   move()
   draw()
-
-  requestAnimationFrame(main)
+  if(game_session) requestAnimationFrame(main);
+  else go_to_defeat()
 }
 
-window.onload = function() {
+
+function start(){
+  go_to_game()
 
   canvas = document.getElementById("game")
   ctx = canvas.getContext("2d")
-
+  init()
+  game_session = true;
+  
   main()
 }
